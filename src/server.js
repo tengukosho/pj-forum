@@ -30,6 +30,14 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const pageLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 60, // Limit page requests to 60 per minute (generous for normal browsing)
+  message: 'Too many page requests, please slow down.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -45,24 +53,24 @@ app.use('/api/categories', apiLimiter, categoryRoutes);
 app.use('/api/topics', apiLimiter, topicRoutes);
 app.use('/api/posts', apiLimiter, postRoutes);
 
-// Serve frontend
-app.get('/', (req, res) => {
+// Serve frontend with rate limiting
+app.get('/', pageLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-app.get('/category/:id', (req, res) => {
+app.get('/category/:id', pageLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/category.html'));
 });
 
-app.get('/topic/:id', (req, res) => {
+app.get('/topic/:id', pageLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/topic.html'));
 });
 
-app.get('/login', (req, res) => {
+app.get('/login', pageLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/login.html'));
 });
 
-app.get('/register', (req, res) => {
+app.get('/register', pageLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/register.html'));
 });
 
