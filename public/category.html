@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category - Forum</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><a href="/">🗨️ Forum Discussion</a></h1>
+            <nav>
+                <div id="auth-links">
+                    <a href="/login">Login</a>
+                    <a href="/register">Register</a>
+                </div>
+                <div id="user-info" style="display: none;">
+                    <span id="username-display"></span>
+                    <button id="logout-btn">Logout</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="breadcrumb">
+            <a href="/">Home</a> &gt; <span id="category-name">Category</span>
+        </div>
+
+        <div class="category-header">
+            <h2 id="category-title">Loading...</h2>
+            <p id="category-description"></p>
+        </div>
+
+        <div class="actions">
+            <button id="create-topic-btn" style="display: none;">Create New Topic</button>
+        </div>
+
+        <div id="topics-list">
+            <h3>Topics</h3>
+            <div id="topics-container">
+                <p>Loading topics...</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="topic-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create New Topic</h2>
+            <form id="topic-form">
+                <input type="text" id="topic-title" placeholder="Topic Title" minlength="5" maxlength="200" required>
+                <textarea id="topic-content" placeholder="Write your first post..." minlength="10" required></textarea>
+                <button type="submit">Create Topic</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/category.js"></script>
+</body>
+</html>
