@@ -50,7 +50,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
-  // Increment view count
+  // Increment view count (Note: For high-traffic forums, consider batching or async analytics)
   db.run('UPDATE topics SET view_count = view_count + 1 WHERE id = ?', [id]);
 
   db.get(
@@ -130,7 +130,7 @@ router.post('/',
             [topicId, user_id, content],
             function(err) {
               if (err) {
-                // Rollback topic creation
+                // Rollback topic creation (Note: For production, use db.serialize() with proper transactions)
                 db.run('DELETE FROM topics WHERE id = ?', [topicId]);
                 return res.status(500).json({ error: 'Failed to create post' });
               }
