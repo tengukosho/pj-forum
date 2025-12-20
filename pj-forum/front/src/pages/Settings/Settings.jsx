@@ -1,264 +1,188 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { usersAPI } from '../../api';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { AuthContext } from '../../contexts/AuthContext'
+import axios from 'axios'
 
 export default function Settings() {
-  const { user, setUser } = useAuth();
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('profile');
+  const { user, login } = useContext(AuthContext)
+  const navigate = useNavigate()
   
-  const [formData, setFormData] = useState({
-    username: user?.username || '',
-    avatar: user?.avatar || '',
-    bio: user?.bio || '',
-  });
-
-  const [adminSettings, setAdminSettings] = useState({
-    autoDeleteDays: localStorage.getItem('autoDeleteDays') || 90,
-    allowRegistration: localStorage.getItem('allowRegistration') !== 'false',
-    allowAnonymous: localStorage.getItem('allowAnonymous') !== 'false',
-    autoApprove: localStorage.getItem('autoApprove') !== 'false',
-    emailVerification: localStorage.getItem('emailVerification') === 'true',
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false)
+  const [form, setForm] = useState({
+    username: '',
+    avatar: '',
+    bio: ''
+  })
+  
+  const [systemSettings, setSystemSettings] = useState({
+    autoDeleteDays: 30
+  })
 
   useEffect(() => {
-    if (!user) navigate('/login');
-  }, [user, navigate]);
-
-  const handleProfileSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
-
-    if (formData.username.length < 3 || formData.username.length > 50) {
-      setError('Tên người dùng phải từ 3-50 ký tự');
-      return;
+    if (!user) {
+      navigate('/login')
+      return
     }
+    
+    setForm({
+      username: user.username || '',
+      avatar: user.avatar || '',
+      bio: user.bio || ''
+    })
+  }, [user, navigate])
 
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    
     try {
-      setLoading(true);
-      const res = await usersAPI.update(user.id, formData);
+      const token = localStorage.getItem('token')
+      const res = await axios.put(
+        `http://localhost:8080/api/users/${user.id}`,
+        form,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      )
       
-      const updatedUser = { ...user, ...formData };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      // Update local user data
+      const updatedUser = { ...user, ...form }
+      login(updatedUser)
+      localStorage.setItem('user', JSON.stringify(updatedUser))
       
-      setMessage('✅ Cập nhật thành công!');
-      setTimeout(() => setMessage(''), 3000);
+      alert('✅ Cập nhật thành công!')
     } catch (err) {
-      setError(err.response?.data?.message || 'Không thể cập nhật thông tin');
+      console.error('Update error:', err)
+      alert('❌ ' + (err.response?.data?.message || 'Không thể cập nhật'))
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const handleAdminSubmit = (e) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
+  const handleUpdateSystem = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    
+    try {
+      await axios.put(
+        'http://localhost:8080/api/settings/system',
+        systemSettings,
+        { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
+      )
+      
+      alert('✅ Cập nhật cài đặt hệ thống thành công!')
+    } catch (err) {
+      alert('❌ ' + (err.response?.data?.message || 'Không thể cập nhật'))
+    } finally {
+      setLoading(false)
+    }
+  }
 
-    localStorage.setItem('autoDeleteDays', adminSettings.autoDeleteDays);
-    localStorage.setItem('allowRegistration', adminSettings.allowRegistration);
-    localStorage.setItem('allowAnonymous', adminSettings.allowAnonymous);
-    localStorage.setItem('autoApprove', adminSettings.autoApprove);
-    localStorage.setItem('emailVerification', adminSettings.emailVerification);
-
-    setMessage('✅ Cài đặt đã được lưu!');
-    setTimeout(() => setMessage(''), 3000);
-  };
-
-  if (!user) return null;
-
-  const isAdmin = user.role === 'ADMIN';
-  const isModerator = user.role === 'MODERATOR';
-  const canManageUsers = isAdmin || isModerator;
+  if (!user) return null
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-4xl">
-      <h1 className="text-2xl font-bold text-voz-text mb-6">⚙️ Cài đặt</h1>
-
-      {/* Tab Navigation */}
-      <div className="forum-box mb-6">
-        <div className="flex border-b border-voz-border">
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 font-medium transition ${
-              activeTab === 'profile'
-                ? 'text-voz-orange border-b-2 border-voz-orange'
-                : 'text-voz-gray hover:text-voz-text'
-            }`}
-          >
-            👤 Thông tin cá nhân
-          </button>
-
-          {isAdmin && (
-            <button
-              onClick={() => setActiveTab('admin')}
-              className={`px-6 py-3 font-medium transition ${
-                activeTab === 'admin'
-                  ? 'text-voz-orange border-b-2 border-voz-orange'
-                  : 'text-voz-gray hover:text-voz-text'
-              }`}
-            >
-              🔧 Cài đặt hệ thống
-            </button>
-          )}
-
-          {canManageUsers && (
-            <button
-              onClick={() => navigate('/users')}
-              className="px-6 py-3 font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition"
-            >
-              👥 Quản lý người dùng →
-            </button>
-          )}
+    <div className="max-w-3xl mx-auto px-4 py-6">
+      
+      <div className="bg-white rounded-lg shadow mb-6">
+        <div className="p-6 border-b">
+          <h2 className="text-xl font-bold">⚙️ Cài đặt tài khoản</h2>
         </div>
+        
+        <form onSubmit={handleUpdateProfile} className="p-6 space-y-4">
+          
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center text-white text-2xl font-bold">
+              {form.username?.[0]?.toUpperCase() || 'U'}
+            </div>
+            <div>
+              <div className="font-medium">{user.username}</div>
+              <div className="text-sm text-slate-500">{user.email}</div>
+              <div className="text-xs text-slate-400 mt-1">
+                {user.role === 'ADMIN' ? '👑 Admin' :
+                 user.role === 'MODERATOR' ? '🛡️ Moderator' :
+                 '👤 Thành viên'}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Tên hiển thị</label>
+            <input
+              type="text"
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">URL Avatar</label>
+            <input
+              type="url"
+              value={form.avatar}
+              onChange={(e) => setForm({ ...form, avatar: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+              placeholder="https://example.com/avatar.jpg"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Giới thiệu</label>
+            <textarea
+              value={form.bio}
+              onChange={(e) => setForm({ ...form, bio: e.target.value })}
+              rows={3}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
+              placeholder="Viết vài dòng về bản thân..."
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50"
+          >
+            {loading ? 'Đang lưu...' : '💾 Lưu thay đổi'}
+          </button>
+        </form>
       </div>
 
-      {/* Messages */}
-      {message && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded">
-          {message}
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded">
-          {error}
-        </div>
-      )}
-
-      {/* Profile Settings Tab */}
-      {activeTab === 'profile' && (
-        <div className="forum-box p-6">
-          <h2 className="text-xl font-bold mb-4">Chỉnh sửa thông tin cá nhân</h2>
+      {user.role === 'ADMIN' && (
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6 border-b">
+            <h2 className="text-xl font-bold">🔧 Cài đặt hệ thống</h2>
+          </div>
           
-          <form onSubmit={handleProfileSubmit} className="space-y-4">
+          <form onSubmit={handleUpdateSystem} className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Tên người dùng</label>
-              <input
-                type="text"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="w-full px-3 py-2 border border-voz-border rounded focus:ring-2 focus:ring-voz-orange"
-                minLength={3}
-                maxLength={50}
-                required
-              />
-              <p className="text-xs text-voz-gray mt-1">3-50 ký tự</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">URL Avatar</label>
-              <input
-                type="url"
-                value={formData.avatar}
-                onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                className="w-full px-3 py-2 border border-voz-border rounded focus:ring-2 focus:ring-voz-orange"
-                placeholder="https://example.com/avatar.jpg"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Giới thiệu bản thân</label>
-              <textarea
-                value={formData.bio}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                className="w-full px-3 py-2 border border-voz-border rounded focus:ring-2 focus:ring-voz-orange resize-vertical"
-                rows={4}
-                maxLength={500}
-                placeholder="Viết vài dòng về bạn..."
-              />
-              <p className="text-xs text-voz-gray mt-1">{formData.bio.length}/500 ký tự</p>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary disabled:opacity-50"
-            >
-              {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* Admin Settings Tab */}
-      {activeTab === 'admin' && isAdmin && (
-        <div className="forum-box p-6">
-          <h2 className="text-xl font-bold mb-4">Cài đặt hệ thống</h2>
-          
-          <form onSubmit={handleAdminSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Tự động xóa bài viết cũ (số ngày)
+              <label className="block text-sm font-medium mb-1">
+                Tự động xóa bài cũ sau (ngày)
               </label>
               <input
                 type="number"
                 min="1"
                 max="365"
-                value={adminSettings.autoDeleteDays}
-                onChange={(e) => setAdminSettings({ ...adminSettings, autoDeleteDays: e.target.value })}
-                className="w-full px-3 py-2 border border-voz-border rounded focus:ring-2 focus:ring-voz-orange"
+                value={systemSettings.autoDeleteDays}
+                onChange={(e) => setSystemSettings({ 
+                  ...systemSettings, 
+                  autoDeleteDays: parseInt(e.target.value) 
+                })}
+                className="w-40 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary"
               />
-              <p className="text-xs text-voz-gray mt-1">
-                Bài viết không hoạt động quá {adminSettings.autoDeleteDays} ngày sẽ tự động bị xóa
+              <p className="text-xs text-slate-500 mt-1">
+                Bài viết cũ hơn {systemSettings.autoDeleteDays} ngày sẽ tự động xóa
               </p>
             </div>
 
-            <div className="space-y-3">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={adminSettings.allowRegistration}
-                  onChange={(e) => setAdminSettings({ ...adminSettings, allowRegistration: e.target.checked })}
-                  className="w-4 h-4"
-                />
-                <span>Cho phép đăng ký tài khoản mới</span>
-              </label>
-
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={adminSettings.allowAnonymous}
-                  onChange={(e) => setAdminSettings({ ...adminSettings, allowAnonymous: e.target.checked })}
-                  className="w-4 h-4"
-                />
-                <span>Cho phép đăng bài ẩn danh</span>
-              </label>
-
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={adminSettings.autoApprove}
-                  onChange={(e) => setAdminSettings({ ...adminSettings, autoApprove: e.target.checked })}
-                  className="w-4 h-4"
-                />
-                <span>Tự động duyệt bài viết</span>
-              </label>
-
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={adminSettings.emailVerification}
-                  onChange={(e) => setAdminSettings({ ...adminSettings, emailVerification: e.target.checked })}
-                  className="w-4 h-4"
-                />
-                <span>Yêu cầu xác thực email</span>
-              </label>
-            </div>
-
-            <button type="submit" className="btn btn-primary">
-              Lưu cài đặt
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 disabled:opacity-50"
+            >
+              {loading ? 'Đang lưu...' : 'Lưu cài đặt hệ thống'}
             </button>
           </form>
         </div>
       )}
     </div>
-  );
+  )
 }

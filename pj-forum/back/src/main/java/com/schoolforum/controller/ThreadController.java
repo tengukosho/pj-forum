@@ -122,11 +122,11 @@ public class ThreadController {
     }
 
     /**
-     * Pin/Unpin thread (MODERATOR/ADMIN only)
+     * Pin/Unpin thread (ADMIN only)
      * POST /api/threads/{id}/pin
      */
     @PostMapping("/{id}/pin")
-    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> togglePin(@PathVariable Long id) {
         threadService.togglePin(id);
         return ResponseEntity.ok().build();

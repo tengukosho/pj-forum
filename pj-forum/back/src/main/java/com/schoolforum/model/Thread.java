@@ -41,9 +41,6 @@ public class Thread {
     @Column(nullable = false)
     private Boolean isLocked = false;
 
-    @Column(nullable = false)
-    private Integer views = 0;
-
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -93,14 +90,5 @@ public class Thread {
     
     public void setLocked(boolean locked) {
         this.isLocked = locked;
-    }
-    
-    // Helper for view count
-    public Integer getViewCount() {
-        return this.views != null ? this.views : 0;
-    }
-    
-    public void setViewCount(Integer count) {
-        this.views = count;
     }
 }

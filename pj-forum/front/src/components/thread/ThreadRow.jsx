@@ -48,7 +48,6 @@ export default function ThreadRow({ thread }) {
             <span>•</span>
             <span>💬 {thread.replyCount}</span>
             <span>•</span>
-            <span>👁 {thread.viewCount}</span>
             {thread.categoryName && (
               <>
                 <span>•</span>

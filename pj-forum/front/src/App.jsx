@@ -8,9 +8,8 @@ import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import ThreadPage from './pages/Thread/ThreadPage';
 import CreateThread from './pages/CreateThread/CreateThread';
+import EditThread from './pages/EditThread/EditThread';
 import Category from './pages/Category/Category';
-import Profile from './pages/Profile/Profile';
-import EditProfile from './pages/Profile/EditProfile';
 import Settings from './pages/Settings/Settings';
 import UserManagement from './pages/UserManagement/UserManagement';
 
@@ -27,9 +26,8 @@ export default function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/thread/:id" element={<ThreadPage />} />
               <Route path="/create-thread" element={<CreateThread />} />
+              <Route path="/edit-thread/:id" element={<EditThread />} />
               <Route path="/category/:id" element={<Category />} />
-              <Route path="/profile/:id" element={<Profile />} />
-              <Route path="/profile/edit" element={<EditProfile />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/users" element={<UserManagement />} />
             </Routes>

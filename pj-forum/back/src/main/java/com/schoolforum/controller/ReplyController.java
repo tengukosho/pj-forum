@@ -56,6 +56,22 @@ public class ReplyController {
     }
 
     /**
+     * Create new reply - simpler endpoint
+     * POST /api/replies
+     */
+    @PostMapping("/replies")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ReplyDTO> createReplySimple(
+            @Valid @RequestBody CreateReplyRequest request,
+            HttpServletRequest httpRequest) {
+        
+        Long userId = extractUserId(httpRequest);
+        Long threadId = request.getThreadId();
+        ReplyDTO reply = replyService.createReply(threadId, request, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reply);
+    }
+
+    /**
      * Update reply (author/moderator/admin)
      * PUT /api/replies/{id}
      */

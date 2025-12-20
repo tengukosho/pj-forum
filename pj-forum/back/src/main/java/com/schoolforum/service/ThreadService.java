@@ -70,17 +70,9 @@ public class ThreadService {
     /**
      * Get thread by ID with full details
      */
-    @Transactional
     public ThreadDTO getThreadById(Long id) {
         com.schoolforum.model.Thread thread = threadDAO.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Thread", "id", id));
-        
-        // Increment view count using atomic update (prevents version lock)
-        try {
-            threadDAO.incrementViewCount(id);
-        } catch (Exception e) {
-            // Ignore view count errors - not critical
-        }
         
         return convertToDetailDTO(thread);
     }
@@ -103,7 +95,6 @@ public class ThreadService {
         thread.setCategory(category);
         thread.setPinned(false);
         thread.setLocked(false);
-        thread.setViewCount(0);
         thread.setCreatedAt(LocalDateTime.now());
         thread.setUpdatedAt(LocalDateTime.now());
         
@@ -126,17 +117,16 @@ public class ThreadService {
 
     /**
      * Update thread
+     * Users can only edit their own threads
      */
     @Transactional
     public ThreadDTO updateThread(Long threadId, CreateThreadRequest request, Long userId, String userRole) {
         com.schoolforum.model.Thread thread = threadDAO.findById(threadId)
             .orElseThrow(() -> new RuntimeException("Thread not found"));
         
-        // Check permission: author, moderator, or admin
-        if (!thread.getAuthor().getId().equals(userId) && 
-            !userRole.equals("MODERATOR") && 
-            !userRole.equals("ADMIN")) {
-            throw new RuntimeException("Unauthorized to edit this thread");
+        // Only the author can edit
+        if (!thread.getAuthor().getId().equals(userId)) {
+            throw new RuntimeException("Only the author can edit this thread");
         }
         
         thread.setTitle(request.getTitle());
@@ -155,24 +145,48 @@ public class ThreadService {
 
     /**
      * Delete thread
+     * Rules:
+     * - Users can delete their own threads
+     * - Moderators can delete User threads (not Admin/Mod threads)
+     * - Admins can delete User and Mod threads (not other Admin threads)
      */
     @Transactional
     public void deleteThread(Long threadId, Long userId, String userRole) {
         com.schoolforum.model.Thread thread = threadDAO.findById(threadId)
             .orElseThrow(() -> new RuntimeException("Thread not found"));
         
-        // Check permission: author, moderator, or admin
-        if (!thread.getAuthor().getId().equals(userId) && 
-            !userRole.equals("MODERATOR") && 
-            !userRole.equals("ADMIN")) {
-            throw new RuntimeException("Unauthorized to delete this thread");
+        User author = thread.getAuthor();
+        String authorRole = author.getRole().name();
+        
+        // User can delete own thread
+        if (author.getId().equals(userId)) {
+            threadDAO.delete(thread);
+            return;
         }
         
-        threadDAO.delete(thread);
+        // Moderator permissions
+        if (userRole.equals("MODERATOR")) {
+            if (authorRole.equals("USER")) {
+                threadDAO.delete(thread);
+                return;
+            }
+            throw new RuntimeException("Moderators cannot delete Admin/Moderator threads");
+        }
+        
+        // Admin permissions
+        if (userRole.equals("ADMIN")) {
+            if (authorRole.equals("ADMIN")) {
+                throw new RuntimeException("Cannot delete another Admin's thread");
+            }
+            threadDAO.delete(thread);
+            return;
+        }
+        
+        throw new RuntimeException("Unauthorized to delete this thread");
     }
 
     /**
-     * Pin/Unpin thread (MODERATOR/ADMIN only)
+     * Pin/Unpin thread (ADMIN only)
      */
     @Transactional
     public void togglePin(Long threadId) {
@@ -204,7 +218,6 @@ public class ThreadService {
         dto.setAuthor(convertToAuthorDTO(thread.getAuthor()));
         dto.setCategoryName(thread.getCategory().getName());
         dto.setReplyCount(replyDAO.countByThreadId(thread.getId()));
-        dto.setViewCount(thread.getViewCount());
         dto.setPinned(thread.isPinned());
         dto.setLocked(thread.isLocked());
         dto.setCreatedAt(thread.getCreatedAt());
@@ -227,7 +240,6 @@ public class ThreadService {
         dto.setAuthor(convertToAuthorDTO(thread.getAuthor()));
         dto.setCategoryId(thread.getCategory().getId());
         dto.setCategoryName(thread.getCategory().getName());
-        dto.setViewCount(thread.getViewCount());
         dto.setPinned(thread.isPinned());
         dto.setLocked(thread.isLocked());
         dto.setCreatedAt(thread.getCreatedAt());
@@ -244,6 +256,23 @@ public class ThreadService {
                 .collect(Collectors.toList()));
         }
         
+        // Add replies
+        List<Reply> replies = replyDAO.findByThreadIdOrderByCreatedAtAsc(thread.getId());
+        dto.setReplies(replies.stream()
+            .map(this::convertToReplyDTO)
+            .collect(Collectors.toList()));
+        dto.setReplyCount(replies.size());
+        
+        return dto;
+    }
+    
+    private ReplyDTO convertToReplyDTO(Reply reply) {
+        ReplyDTO dto = new ReplyDTO();
+        dto.setId(reply.getId());
+        dto.setContent(reply.getContent());
+        dto.setAuthor(convertToAuthorDTO(reply.getAuthor()));
+        dto.setCreatedAt(reply.getCreatedAt());
+        dto.setUpdatedAt(reply.getUpdatedAt());
         return dto;
     }
     

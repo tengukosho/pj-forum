@@ -15,8 +15,6 @@ public class ThreadListDTO {
     private Boolean isAnonymous;
     private Boolean isPinned;
     private Boolean isLocked;
-    private Integer views;
-    private Integer viewCount; // Alias for compatibility
     private Integer replyCount;
     private LocalDateTime createdAt;
     private LocalDateTime lastReplyAt;
@@ -32,11 +30,6 @@ public class ThreadListDTO {
     
     public void setLocked(boolean locked) {
         this.isLocked = locked;
-    }
-    
-    public void setViewCount(Integer count) {
-        this.viewCount = count;
-        this.views = count;
     }
     
     public void setReplyCount(long count) {

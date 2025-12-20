@@ -16,8 +16,6 @@ public class ThreadDTO {
     private Boolean isAnonymous;
     private Boolean isPinned;
     private Boolean isLocked;
-    private Integer views;
-    private Integer viewCount; // Alias for compatibility
     private Integer replyCount;
     private Integer subscriptionCount;
     private LocalDateTime createdAt;
@@ -28,6 +26,7 @@ public class ThreadDTO {
     private Long categoryId; // For simple category ID
     private String categoryName; // For simple category name
     private List<TagDTO> tags;
+    private List<ReplyDTO> replies;
     
     // Helper methods for compatibility
     public void setPinned(boolean pinned) {
@@ -36,10 +35,5 @@ public class ThreadDTO {
     
     public void setLocked(boolean locked) {
         this.isLocked = locked;
-    }
-    
-    public void setViewCount(Integer count) {
-        this.viewCount = count;
-        this.views = count;
     }
 }
