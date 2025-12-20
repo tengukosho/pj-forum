@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-voz-bg text-voz-text;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+  }
+}
+
+@layer components {
+  /* VOZ-style thread table */
+  .thread-table {
+    @apply bg-white border border-voz-border;
+  }
+  
+  .thread-row {
+    @apply border-b border-voz-border hover:bg-voz-hover transition-colors cursor-pointer;
+  }
+  
+  .thread-row:last-child {
+    @apply border-b-0;
+  }
+  
+  .thread-row.pinned {
+    @apply bg-voz-pinned;
+  }
+  
+  /* VOZ-style buttons */
+  .btn {
+    @apply px-4 py-2 rounded font-medium transition-colors;
+  }
+  
+  .btn-primary {
+    @apply bg-voz-blue text-white hover:bg-blue-700;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 text-voz-text hover:bg-gray-300;
+  }
+  
+  /* VOZ-style badges */
+  .badge {
+    @apply inline-block px-2 py-0.5 text-xs rounded font-medium;
+  }
+  
+  .badge-admin {
+    @apply bg-red-500 text-white;
+  }
+  
+  .badge-mod {
+    @apply bg-purple-500 text-white;
+  }
+  
+  /* VOZ-style forum box */
+  .forum-box {
+    @apply bg-white border border-voz-border rounded shadow-sm;
+  }
+  
+  /* VOZ-style avatar */
+  .avatar {
+    @apply w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 
+           flex items-center justify-center text-white font-semibold text-sm flex-shrink-0;
+  }
+  
+  /* Stats */
+  .stat {
+    @apply text-xs text-voz-gray;
+  }
+  
+  /* Input fields */
+  .input {
+    @apply w-full px-3 py-2 border border-voz-border rounded 
+           focus:outline-none focus:ring-2 focus:ring-voz-blue focus:border-transparent;
+  }
+  
+  .textarea {
+    @apply input resize-y;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
