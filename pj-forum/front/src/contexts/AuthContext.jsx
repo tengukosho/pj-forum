@@ -11,11 +11,16 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('token')
     const storedUser = localStorage.getItem('user')
     
+    console.log('🔍 AuthContext Init - Token exists:', !!token)
+    console.log('🔍 AuthContext Init - User exists:', !!storedUser)
+    
     if (token && storedUser) {
       try {
-        setUser(JSON.parse(storedUser))
+        const parsedUser = JSON.parse(storedUser)
+        setUser(parsedUser)
+        console.log('✅ User loaded:', parsedUser.username)
       } catch (err) {
-        console.error('Failed to parse user:', err)
+        console.error('❌ Failed to parse user:', err)
         localStorage.removeItem('user')
         localStorage.removeItem('token')
       }
@@ -23,12 +28,19 @@ export function AuthProvider({ children }) {
     setLoading(false)
   }, [])
 
-  const login = (userData) => {
-    setUser(userData)
+  const login = (userData, token) => {
+    console.log('🔐 Login called with:', userData.username, 'Token:', !!token)
+    
+    // Store both token and user
+    localStorage.setItem('token', token)
     localStorage.setItem('user', JSON.stringify(userData))
+    setUser(userData)
+    
+    console.log('✅ Token saved to localStorage')
   }
 
   const logout = () => {
+    console.log('🚪 Logout called')
     setUser(null)
     localStorage.removeItem('user')
     localStorage.removeItem('token')

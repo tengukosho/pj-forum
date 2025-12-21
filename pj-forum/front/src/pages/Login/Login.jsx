@@ -16,10 +16,21 @@ export default function Login() {
     
     try {
       setLoading(true);
+      console.log('🔐 Attempting login...');
+      
       const res = await authAPI.login(form.email, form.password);
+      
+      console.log('✅ Login response received');
+      console.log('📦 Token:', res.data.token?.substring(0, 20) + '...');
+      console.log('👤 User:', res.data.user.username);
+      
+      // Pass both user and token to login function
       login(res.data.user, res.data.token);
+      
+      console.log('✅ Login successful, redirecting...');
       navigate('/');
     } catch (err) {
+      console.error('❌ Login failed:', err);
       setError(err.response?.data?.message || 'Đăng nhập thất bại');
     } finally {
       setLoading(false);

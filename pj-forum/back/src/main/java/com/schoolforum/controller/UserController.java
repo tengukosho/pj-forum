@@ -26,13 +26,18 @@ public class UserController {
     private JwtUtil jwtUtil;
 
     private User getCurrentUser(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        if (token == null || !token.startsWith("Bearer ")) {
+        try {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return null;
+            }
+            String token = authHeader.substring(7);
+            Long userId = jwtUtil.extractUserId(token);
+            return userDAO.findById(userId).orElse(null);
+        } catch (Exception e) {
+            System.err.println("Error extracting user from token: " + e.getMessage());
             return null;
         }
-        token = token.substring(7);
-        Long userId = jwtUtil.extractUserId(token);
-        return userDAO.findById(userId).orElse(null);
     }
 
     @GetMapping("/{id}")
@@ -49,7 +54,7 @@ public class UserController {
             User currentUser = getCurrentUser(request);
             
             if (currentUser == null) {
-                return ResponseEntity.status(403).body(Map.of("message", "Not authenticated"));
+                return ResponseEntity.status(401).body(Map.of("message", "Not authenticated"));
             }
             
             if (currentUser.getRole() != User.Role.ADMIN && currentUser.getRole() != User.Role.MODERATOR) {
@@ -77,7 +82,7 @@ public class UserController {
         try {
             User currentUser = getCurrentUser(request);
             if (currentUser == null) {
-                return ResponseEntity.status(403).body(Map.of("message", "Not authenticated"));
+                return ResponseEntity.status(401).body(Map.of("message", "Not authenticated"));
             }
 
             User userToUpdate = userDAO.findById(id)
@@ -111,8 +116,11 @@ public class UserController {
     public ResponseEntity<?> banUser(@PathVariable Long id, HttpServletRequest request) {
         try {
             User currentUser = getCurrentUser(request);
-            if (currentUser == null || 
-                (currentUser.getRole() != User.Role.ADMIN && currentUser.getRole() != User.Role.MODERATOR)) {
+            if (currentUser == null) {
+                return ResponseEntity.status(401).body(Map.of("message", "Not authenticated"));
+            }
+            
+            if (currentUser.getRole() != User.Role.ADMIN && currentUser.getRole() != User.Role.MODERATOR) {
                 return ResponseEntity.status(403).body(Map.of("message", "Not authorized"));
             }
             
@@ -136,8 +144,11 @@ public class UserController {
     public ResponseEntity<?> unbanUser(@PathVariable Long id, HttpServletRequest request) {
         try {
             User currentUser = getCurrentUser(request);
-            if (currentUser == null || 
-                (currentUser.getRole() != User.Role.ADMIN && currentUser.getRole() != User.Role.MODERATOR)) {
+            if (currentUser == null) {
+                return ResponseEntity.status(401).body(Map.of("message", "Not authenticated"));
+            }
+            
+            if (currentUser.getRole() != User.Role.ADMIN && currentUser.getRole() != User.Role.MODERATOR) {
                 return ResponseEntity.status(403).body(Map.of("message", "Not authorized"));
             }
             
@@ -161,7 +172,11 @@ public class UserController {
         
         try {
             User currentUser = getCurrentUser(request);
-            if (currentUser == null || currentUser.getRole() != User.Role.ADMIN) {
+            if (currentUser == null) {
+                return ResponseEntity.status(401).body(Map.of("message", "Not authenticated"));
+            }
+            
+            if (currentUser.getRole() != User.Role.ADMIN) {
                 return ResponseEntity.status(403).body(Map.of("message", "Only admin"));
             }
             
@@ -186,7 +201,11 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
         try {
             User currentUser = getCurrentUser(request);
-            if (currentUser == null || currentUser.getRole() != User.Role.ADMIN) {
+            if (currentUser == null) {
+                return ResponseEntity.status(401).body(Map.of("message", "Not authenticated"));
+            }
+            
+            if (currentUser.getRole() != User.Role.ADMIN) {
                 return ResponseEntity.status(403).body(Map.of("message", "Only admin"));
             }
             
