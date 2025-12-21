@@ -342,13 +342,8 @@ This project is developed for academic purposes.
 **School Forum Development Team**
 
 - **Project**: School Forum Web Application
-- **Course**: Web Application Development_S1_2025-26_G01_lab04
+- **Course**: Web Application Development_S1_2025-26_G01
 
-## 📞 Contact
-
-For questions or issues regarding this project, please contact:
-- Email: [your-email@example.com]
-- GitHub: [your-github-username]
 
 ---
 
