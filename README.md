@@ -338,14 +338,13 @@ This project is developed for academic purposes.
 **School Forum Development Team**
 
 - **Project**: School Forum Web Application
-- **Course**: [Your Course Name]
-- **Institution**: [Your Institution]
+- **Course**: Web Application Development 
 
 ## 📞 Contact
 
 For questions or issues regarding this project, please contact:
-- Email: [your-email@example.com]
-- GitHub: [your-github-username]
+- Email: quoctrang613@gmail.com
+- GitHub: https://github.com/quoctarng01
 
 ---
 
