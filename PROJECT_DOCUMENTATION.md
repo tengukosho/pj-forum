@@ -26,9 +26,7 @@ This project is a comprehensive forum application designed for educational insti
 - **Thread Categories**: Organized into categories (General Discussion, Homework Help, Programming & Tech, etc.)
 - **Thread Features**: 
   - Pinning important threads (Admin only)
-  - Locking threads to prevent further replies (Moderator/Admin)
   - Anonymous posting option
-  - Thread subscriptions for notifications
 
 #### Reply System
 - **Post Replies**: Users can reply to threads
@@ -40,16 +38,8 @@ This project is a comprehensive forum application designed for educational insti
 - **Pagination**: Efficient pagination for large thread lists
 - **Sorting**: Sort threads by creation date, last reply, etc.
 
-#### Notifications
-- **Real-time Notifications**: Users receive notifications for:
-  - New replies to their threads
-  - Replies in subscribed threads
-  - System announcements
-  - User mentions
-
 #### Additional Features
 - **Tags System**: Tag threads for better organization
-- **Thread Subscriptions**: Subscribe to threads for updates
 - **Responsive Design**: Modern UI built with Tailwind CSS
 - **RESTful API**: Well-structured backend API
 
@@ -236,7 +226,6 @@ Currently, all configuration is in `application.properties`. For production, con
 
 3. **Moderate Threads**
    - Pin important threads
-   - Lock threads to prevent further replies
    - Delete inappropriate content
 
 ---
@@ -259,17 +248,14 @@ back/
 │       │   │   ├── AdminController.java    # Admin operations
 │       │   │   ├── AuthController.java     # Authentication endpoints
 │       │   │   ├── CategoryController.java # Category management
-│       │   │   ├── NotificationController.java # Notifications
 │       │   │   ├── ReplyController.java    # Reply management
 │       │   │   ├── ThreadController.java    # Thread management
 │       │   │   └── UserController.java     # User management
 │       │   ├── dao/                 # Data Access Objects (JPA Repositories)
 │       │   │   ├── CategoryDAO.java
-│       │   │   ├── NotificationDAO.java
 │       │   │   ├── ReplyDAO.java
 │       │   │   ├── TagDAO.java
 │       │   │   ├── ThreadDAO.java
-│       │   │   ├── ThreadSubscriptionDAO.java
 │       │   │   └── UserDAO.java
 │       │   ├── dto/                 # Data Transfer Objects
 │       │   │   ├── AuthResponse.java
@@ -282,17 +268,14 @@ back/
 │       │   │   └── UserDTO.java
 │       │   ├── model/               # Entity Models (JPA)
 │       │   │   ├── Category.java
-│       │   │   ├── Notification.java
 │       │   │   ├── Reply.java
 │       │   │   ├── Tag.java
 │       │   │   ├── Thread.java
-│       │   │   ├── ThreadSubscription.java
 │       │   │   └── User.java
 │       │   ├── security/            # Security components
 │       │   │   └── JwtAuthenticationFilter.java
 │       │   ├── service/             # Business Logic Layer
 │       │   │   ├── AuthService.java
-│       │   │   ├── NotificationService.java
 │       │   │   ├── ReplyService.java
 │       │   │   ├── ScheduledTaskService.java
 │       │   │   └── ThreadService.java
@@ -463,7 +446,6 @@ Authorization: Bearer <jwt_token>
 | PUT | `/api/threads/{id}` | Update thread | Author/Mod/Admin |
 | DELETE | `/api/threads/{id}` | Delete thread | Author/Mod/Admin |
 | POST | `/api/threads/{id}/pin` | Pin/unpin thread | Admin only |
-| POST | `/api/threads/{id}/lock` | Lock/unlock thread | Mod/Admin |
 
 **Query Parameters for GET `/api/threads`:**
 - `page`: Page number (default: 0)
@@ -500,7 +482,6 @@ Authorization: Bearer <jwt_token>
     {"id": 1, "name": "java"}
   ],
   "isPinned": false,
-  "isLocked": false,
   "createdAt": "2025-12-22T10:00:00",
   "lastReplyAt": "2025-12-22T11:00:00"
 }
@@ -544,13 +525,6 @@ Authorization: Bearer <jwt_token>
 | PUT | `/api/users/{id}` | Update user | Owner/Admin |
 | PUT | `/api/users/{id}/ban` | Ban user | Admin only |
 | PUT | `/api/users/{id}/unban` | Unban user | Admin only |
-
-#### Notification Endpoints (`/api/notifications`)
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/notifications` | Get user's notifications | Yes |
-| PUT | `/api/notifications/{id}/read` | Mark notification as read | Yes |
 
 ---
 
@@ -806,7 +780,7 @@ function ProtectedRoute({ children }) {
 
 1. **JWT Token Storage**: Tokens are stored in localStorage, which is vulnerable to XSS attacks. Consider using httpOnly cookies for production.
 
-2. **No Real-time Updates**: Notifications and new replies require page refresh. Consider implementing WebSockets for real-time features.
+2. **No Real-time Updates**: New replies require page refresh. Consider implementing WebSockets for real-time features.
 
 3. **File Upload**: File upload functionality is configured but not fully implemented in the UI.
 
@@ -833,7 +807,6 @@ function ProtectedRoute({ children }) {
 ### Recommendations for Future Improvements
 
 1. **Real-time Features**
-   - Implement WebSocket support for live notifications
    - Real-time reply updates without page refresh
 
 2. **Enhanced Search**
@@ -915,4 +888,7 @@ function ProtectedRoute({ children }) {
 **Document Version**: 1.0  
 **Last Updated**: December 2025  
 **Author**: School Forum Development Team
+
+
+
 
