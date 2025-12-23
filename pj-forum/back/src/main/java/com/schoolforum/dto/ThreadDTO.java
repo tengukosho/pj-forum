@@ -15,9 +15,7 @@ public class ThreadDTO {
     private String content;
     private Boolean isAnonymous;
     private Boolean isPinned;
-    private Boolean isLocked;
     private Integer replyCount;
-    private Integer subscriptionCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastReplyAt;

@@ -94,7 +94,6 @@ public class ThreadService {
         thread.setAuthor(author);
         thread.setCategory(category);
         thread.setPinned(false);
-        thread.setLocked(false);
         thread.setCreatedAt(LocalDateTime.now());
         thread.setUpdatedAt(LocalDateTime.now());
         
@@ -228,7 +227,6 @@ public class ThreadService {
         dto.setCategoryId(thread.getCategory().getId());
         dto.setCategoryName(thread.getCategory().getName());
         dto.setPinned(thread.isPinned());
-        dto.setLocked(thread.isLocked());
         dto.setCreatedAt(thread.getCreatedAt());
         dto.setUpdatedAt(thread.getUpdatedAt());
         
