@@ -30,8 +30,4 @@ public class ThreadDTO {
     public void setPinned(boolean pinned) {
         this.isPinned = pinned;
     }
-    
-    public void setLocked(boolean locked) {
-        this.isLocked = locked;
-    }
 }

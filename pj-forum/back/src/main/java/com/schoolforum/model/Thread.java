@@ -41,9 +41,6 @@ public class Thread {
     @Column(nullable = false)
     private Boolean isPinned = false;
 
-    @Column(nullable = false)
-    private Boolean isLocked = false;
-
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -78,19 +75,11 @@ public class Thread {
     @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     
     // Helper methods for boolean checks
-    public boolean isLocked() {
-        return this.isLocked != null && this.isLocked;
-    }
-    
     public boolean isPinned() {
         return this.isPinned != null && this.isPinned;
     }
     
     public void setPinned(boolean pinned) {
         this.isPinned = pinned;
-    }
-    
-    public void setLocked(boolean locked) {
-        this.isLocked = locked;
     }
 }

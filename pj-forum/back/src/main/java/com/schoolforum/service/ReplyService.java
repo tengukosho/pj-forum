@@ -50,10 +50,6 @@ public class ReplyService {
         Thread thread = threadDAO.findById(threadId)
             .orElseThrow(() -> new RuntimeException("Thread not found"));
         
-        if (thread.isLocked()) {
-            throw new RuntimeException("Thread is locked");
-        }
-        
         User author = userDAO.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
         
