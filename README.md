@@ -15,7 +15,7 @@ School Forum is a comprehensive discussion platform designed for educational ins
 - **Secure Authentication**: JWT-based authentication system
 - **Role-Based Access**: Three-tier permission system (USER, MODERATOR, ADMIN)
 - **Rich Content Management**: Threads, replies, categories, and tags
-- **User Engagement**: Notifications, subscriptions, and activity tracking
+- **User Engagement**: Activity tracking
 - **Modern UI**: Responsive design with Tailwind CSS
 
 ## ✨ Features
@@ -31,7 +31,6 @@ School Forum is a comprehensive discussion platform designed for educational ins
 - Thread categorization
 - Tag system for better organization
 - Pin important threads (Admin)
-- Lock threads to prevent replies (Moderator/Admin)
 - Anonymous posting option
 - Pagination and sorting
 
@@ -41,8 +40,6 @@ School Forum is a comprehensive discussion platform designed for educational ins
 - Thread view tracking
 
 ### Additional Features
-- **Notifications**: Real-time notifications for replies and updates
-- **Thread Subscriptions**: Subscribe to threads for notifications
 - **Search & Filter**: Filter threads by category, sort by date
 - **Responsive Design**: Mobile-friendly interface
 - **RESTful API**: Well-structured backend API
@@ -187,7 +184,7 @@ School Forum is a comprehensive discussion platform designed for educational ins
 
 5. **Admin Functions** (Admin role required)
    - Navigate to `/users` for user management
-   - Pin/lock threads from thread page
+   - Pin threads from thread page
    - Ban/unban users
 
 ## 📁 Folder Structure
@@ -300,7 +297,7 @@ For complete API documentation, see `PROJECT_DOCUMENTATION.md`.
 1. Register a new account
 2. Create a thread in any category
 3. Reply to existing threads
-4. Test admin functions (pin, lock, ban users)
+4. Test admin functions (pin, ban users)
 
 ## 📝 Configuration
 
@@ -325,7 +322,6 @@ Edit `back/src/main/resources/application.properties`:
 
 ## 🔮 Future Improvements
 
-- Real-time notifications with WebSockets
 - Full-text search functionality
 - Rich text editor for content
 - Email verification and password reset
@@ -342,10 +338,19 @@ This project is developed for academic purposes.
 **School Forum Development Team**
 
 - **Project**: School Forum Web Application
-- **Course**: Web Application Development_S1_2025-26_G01
+- **Course**: [Your Course Name]
+- **Institution**: [Your Institution]
 
+## 📞 Contact
+
+For questions or issues regarding this project, please contact:
+- Email: [your-email@example.com]
+- GitHub: [your-github-username]
 
 ---
 
 **Note**: This project is developed as part of an academic course. For production use, additional security measures, testing, and optimizations are recommended.
+
+
+
 
