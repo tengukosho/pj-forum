@@ -72,29 +72,6 @@ public class ReplyService {
         
         return convertToDTO(saved);
     }
-
-    /**
-     * Update reply
-     */
-    @Transactional
-    public ReplyDTO updateReply(Long replyId, CreateReplyRequest request, Long userId, String userRole) {
-        Reply reply = replyDAO.findById(replyId)
-            .orElseThrow(() -> new RuntimeException("Reply not found"));
-        
-        // Check permission: author, moderator, or admin
-        if (!reply.getAuthor().getId().equals(userId) && 
-            !userRole.equals("MODERATOR") && 
-            !userRole.equals("ADMIN")) {
-            throw new RuntimeException("Unauthorized to edit this reply");
-        }
-        
-        reply.setContent(request.getContent());
-        reply.setUpdatedAt(LocalDateTime.now());
-        
-        Reply updated = replyDAO.save(reply);
-        return convertToDTO(updated);
-    }
-
     /**
      * Delete reply
      */

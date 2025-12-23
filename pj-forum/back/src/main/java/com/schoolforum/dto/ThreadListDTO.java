@@ -14,7 +14,6 @@ public class ThreadListDTO {
     private String title;
     private Boolean isAnonymous;
     private Boolean isPinned;
-    private Boolean isLocked;
     private Integer replyCount;
     private LocalDateTime createdAt;
     private LocalDateTime lastReplyAt;
@@ -26,10 +25,6 @@ public class ThreadListDTO {
     // Helper methods for compatibility
     public void setPinned(boolean pinned) {
         this.isPinned = pinned;
-    }
-    
-    public void setLocked(boolean locked) {
-        this.isLocked = locked;
     }
     
     public void setReplyCount(long count) {

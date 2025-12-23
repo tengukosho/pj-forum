@@ -24,21 +24,25 @@ export default function Settings() {
   const [search, setSearch] = useState('')
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login')
-      return
-    }
-    
-    setForm({
-      username: user.username || '',
-      avatar: user.avatar || '',
-      bio: user.bio || ''
-    })
+  if (!user) {
+    navigate('/login')
+    return
+  }
 
-    if (user.role === 'ADMIN' || user.role === 'MODERATOR') {
-      loadUsers()
-    }
-  }, [user, navigate])
+  setForm({
+    username: user.username || '',
+    avatar: user.avatar || '',
+    bio: user.bio || ''
+  })
+
+  if (user.role === 'ADMIN') {
+    loadSystemSettings()
+  }
+
+  if (user.role === 'ADMIN' || user.role === 'MODERATOR') {
+    loadUsers()
+  }
+}, [user, navigate])
 
   const loadUsers = async () => {
     try {
@@ -76,6 +80,22 @@ export default function Settings() {
     }
   }
 
+  const loadSystemSettings = async () => {
+  try {
+    const token = localStorage.getItem('token')
+    const res = await axios.get(
+      'http://localhost:8080/api/admin/settings',
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+
+    setSystemSettings({
+      autoDeleteDays: res.data.autoDeleteDays
+    })
+  } catch (err) {
+    console.error('Failed to load system settings', err)
+  }
+}
+
   const handleUpdateSystem = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -83,11 +103,10 @@ export default function Settings() {
     try {
       const token = localStorage.getItem('token')
       await axios.put(
-        'http://localhost:8080/api/settings/system',
-        systemSettings,
-        { headers: { 'Authorization': `Bearer ${token}` } }
+        'http://localhost:8080/api/admin/settings/auto-delete-days',
+        { days: systemSettings.autoDeleteDays },
+        { headers: { Authorization: `Bearer ${token}` } }
       )
-      
       alert('✅ Cập nhật cài đặt hệ thống thành công!')
     } catch (err) {
       alert('❌ ' + (err.response?.data?.message || 'Không thể cập nhật'))

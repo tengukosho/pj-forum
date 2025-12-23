@@ -72,24 +72,6 @@ public class ReplyController {
     }
 
     /**
-     * Update reply (author/moderator/admin)
-     * PUT /api/replies/{id}
-     */
-    @PutMapping("/replies/{id}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ReplyDTO> updateReply(
-            @PathVariable Long id,
-            @Valid @RequestBody CreateReplyRequest request,
-            HttpServletRequest httpRequest) {
-        
-        Long userId = extractUserId(httpRequest);
-        String role = extractRole(httpRequest);
-        
-        ReplyDTO reply = replyService.updateReply(id, request, userId, role);
-        return ResponseEntity.ok(reply);
-    }
-
-    /**
      * Delete reply (author/moderator/admin)
      * DELETE /api/replies/{id}
      */

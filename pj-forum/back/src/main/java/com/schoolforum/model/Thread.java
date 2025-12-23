@@ -33,6 +33,9 @@ public class Thread {
     private String content;
 
     @Column(nullable = false)
+    private Integer views = 0;
+
+    @Column(nullable = false)
     private Boolean isAnonymous = false;
 
     @Column(nullable = false)
@@ -73,7 +76,6 @@ public class Thread {
     private List<Tag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ThreadSubscription> subscriptions = new ArrayList<>();
     
     // Helper methods for boolean checks
     public boolean isLocked() {

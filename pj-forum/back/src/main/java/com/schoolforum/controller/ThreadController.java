@@ -131,18 +131,6 @@ public class ThreadController {
         threadService.togglePin(id);
         return ResponseEntity.ok().build();
     }
-
-    /**
-     * Lock/Unlock thread (MODERATOR/ADMIN only)
-     * POST /api/threads/{id}/lock
-     */
-    @PostMapping("/{id}/lock")
-    @PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
-    public ResponseEntity<Void> toggleLock(@PathVariable Long id) {
-        threadService.toggleLock(id);
-        return ResponseEntity.ok().build();
-    }
-
     // Helper methods to extract user info from JWT
     private Long extractUserId(HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);

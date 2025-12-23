@@ -197,18 +197,6 @@ public class ThreadService {
         threadDAO.save(thread);
     }
 
-    /**
-     * Lock/Unlock thread (MODERATOR/ADMIN only)
-     */
-    @Transactional
-    public void toggleLock(Long threadId) {
-        com.schoolforum.model.Thread thread = threadDAO.findById(threadId)
-            .orElseThrow(() -> new RuntimeException("Thread not found"));
-        
-        thread.setLocked(!thread.isLocked());
-        threadDAO.save(thread);
-    }
-
     // ===== DTO Conversion Methods =====
     
     private ThreadListDTO convertToListDTO(com.schoolforum.model.Thread thread) {
@@ -219,7 +207,6 @@ public class ThreadService {
         dto.setCategoryName(thread.getCategory().getName());
         dto.setReplyCount(replyDAO.countByThreadId(thread.getId()));
         dto.setPinned(thread.isPinned());
-        dto.setLocked(thread.isLocked());
         dto.setCreatedAt(thread.getCreatedAt());
         dto.setLastReplyAt(thread.getLastReplyAt());
         
